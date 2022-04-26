@@ -33,7 +33,7 @@ public class Card implements Comparable {
    * Creates a new playing card.
    * @param suit the suit value of this card.
    * @param rank the rank value of this card.
-   * @param cardFace the face image of this card.
+   * @param cardFace the face image of this card. 
    */
    public Card( char suit, char rank, ImageIcon cardFace ) {
       cardImage = cardFace;
@@ -62,7 +62,7 @@ public class Card implements Comparable {
 					case 'h':
 						return 2;
 
-					case 's':
+					case 's': 
 						return 3;
 				}
 				return -1;

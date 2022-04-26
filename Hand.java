@@ -6,6 +6,7 @@
 // for the game being implemented.
 
 import java.util.*;
+import javax.swing.*;
 
 
 /**
@@ -20,7 +21,11 @@ public class Hand implements HandInterface {
 
    protected java.util.List hand = new ArrayList();
 
+   // creating a new hand constructor taht uses teh data in defaultlist1 and jlist
+   // public Hand(JList curr){
+   //    hand = curr.getSelectedValuesList();
 
+   // }
   /**
    * Adds a card to this hand.
    * @param card card to be added to the current hand.
@@ -185,6 +190,19 @@ public class Hand implements HandInterface {
            return false;
         hand.set( location, replacementCard );
         return true;
+    }
+
+    public void play(Table currPlaySession) {
+
+      if (currPlaySession.GetTurn() == 1){
+          currPlaySession.p1Deck.doClick();
+          currPlaySession.p1LayOnStack.doClick();
+      }
+      else if (currPlaySession.GetTurn() == 2) {
+         currPlaySession.p2Deck.doClick();
+         currPlaySession.p2LayOnStack.doClick();
+      }
+      // System.out.println("Im here"); // repeating endlessly not changing the value of turn
     }
 
 }
