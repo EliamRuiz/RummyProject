@@ -204,5 +204,8 @@ public class Hand implements HandInterface {
       }
       // System.out.println("Im here"); // repeating endlessly not changing the value of turn
     }
+    public Card getCardAt(int index){
+          return (Card)hand.get(index);
+    }
 
 }

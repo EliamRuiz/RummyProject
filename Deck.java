@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Deck {
 
-   java.util.LinkedList deck;
+   java.util.LinkedList deck; 
    private int index;
 
 

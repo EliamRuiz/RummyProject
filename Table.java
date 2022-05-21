@@ -8,15 +8,15 @@ import java.util.*;
 	@author Patti Ordonez
 */
 
-// public class turn  {
-// 	public static int turn = 1;
 // }
 public class Table extends JFrame implements ActionListener
 {
 	final static int numDealtCards = 9;
-	int turn;
+	int turn; 
 	JPanel player1;
 	JPanel player2;
+	JLabel points;
+	JPanel playerTurn;
 	JPanel deckPiles;
 	JLabel deck;
 	JLabel stack;
@@ -43,17 +43,46 @@ public class Table extends JFrame implements ActionListener
 	DefaultListModel p1Hand;
 	DefaultListModel p2Hand;
 
-	private void deal(Card [] cards)
+	Hand cardsPlayer1;
+	Hand cardsPlayer2;
+
+	boolean drew;
+	boolean layed;
+
+	private void deal(Hand cards)
 	{
-		for(int i = 0; i < cards.length; i ++)
-			cards[i] = (Card)cardDeck.dealCard();
+		
+		for(int i = 0; i < numDealtCards; i ++){
+		    // System.out.println("HEREEEEEEEEEEEEE");
+			cards.addCard((Card)cardDeck.dealCard());
+		}
+		cards.sort();
 	}
-	public void SetTurn (int curr) {
+
+	public void SetTurn (int curr) { // setter for turn variable
 		 this.turn = curr;
+		 this.drew = false;
+		 this.layed = false;
 	}
-	public int GetTurn() {
+	public int GetTurn() { // getter for turn variable
 		return this.turn;
 	}	
+	public boolean OutOfCards() {
+		return this.cardDeck.isEmpty();
+	}
+	public boolean Player1OutOfCards() {
+		return this.cardsPlayer1.isEmpty();
+	}
+	public boolean Player2OutOfCards() {
+		return this.cardsPlayer2.isEmpty();
+	}
+	public Hand getPlayer1Cards() {
+	//	System.out.print(cardsPlayer1.getNumberOfCards());
+		return this.cardsPlayer1;
+	}
+	public Hand getPlayer2Cards() {
+		return this.cardsPlayer2;
+	}
 	public Table()
 	{
 		// sets the window title
@@ -61,6 +90,7 @@ public class Table extends JFrame implements ActionListener
         // sets the wondow standard size and layout
 		setLayout(new BorderLayout());
 		setSize(1200,700);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // creates an empty deck using its default constructor
 		cardDeck = new Deck();
@@ -80,6 +110,7 @@ public class Table extends JFrame implements ActionListener
 
 		for (int i = 0; i < Card.rank.length;i++)
 			setPanels[i] = new SetPanel(Card.getRankIndex(Card.rank[i]));
+		
 
 
 		top.add(setPanels[0]);
@@ -87,7 +118,14 @@ public class Table extends JFrame implements ActionListener
 		top.add(setPanels[2]);
 		top.add(setPanels[3]);
 
+	//	points = new JLabel("Player's one Turn");
+     //   playerTurn = new JPanel();
+    
+	//	playerTurn.add(points);
+
+
 		player1 = new JPanel();
+	//	player1.add(playerTurn);
 
 		player1.add(top);
 
@@ -110,7 +148,7 @@ public class Table extends JFrame implements ActionListener
 
 
 		player2.add(bottom);
-		add(player2, BorderLayout.SOUTH);
+		add(player2, BorderLayout.SOUTH); 
 
 		// creates buttons for player interactions and adds action listeners for the action performed function to catch them
 		JPanel middle = new JPanel(new GridLayout(1,3));
@@ -125,16 +163,17 @@ public class Table extends JFrame implements ActionListener
 		p1LayOnStack.addActionListener(this);
 
         // creates the player_one hand initial cards
-		Card [] cardsPlayer1 = new Card[numDealtCards];
+		cardsPlayer1 = new Hand();
 		deal(cardsPlayer1);
+		cardsPlayer1.sort();
 		p1Hand = new DefaultListModel();
 
 		String InitString = "Initial player one: "; // print the initial deck of cards for each player
-		for(int i = 0; i < cardsPlayer1.length; i++)
+		for(int i = 0; i < cardsPlayer1.getNumberOfCards(); i++)
 		{
-			p1Hand.addElement(cardsPlayer1[i]);
+			p1Hand.addElement(cardsPlayer1.getCard(i));
 			// print the player one first hand 
-            InitString += cardsPlayer1[i]; // part of
+            InitString += cardsPlayer1.getCard(i); // part of
 			InitString += ", "; // part of 
 		}
 		System.out.println(InitString); //  up to here 
@@ -187,16 +226,17 @@ public class Table extends JFrame implements ActionListener
 		p2LayOnStack = new JButton("LayOnStack");
 		p2LayOnStack.addActionListener(this);
 
-		Card [] cardsPlayer2 = new Card[numDealtCards];
+		cardsPlayer2 = new Hand();
 		deal(cardsPlayer2);
+		cardsPlayer2.sort();
 		p2Hand = new DefaultListModel();
 
 		String InitString2 = "Initial player two: "; // print the initial deck of cards for each player
-		for(int i = 0; i < cardsPlayer2.length; i++)
+		for(int i = 0; i < cardsPlayer2.getNumberOfCards(); i++)
 		{
 
-			p2Hand.addElement(cardsPlayer2[i]);
-			InitString2 += cardsPlayer2[i]; // part of
+			p2Hand.addElement(cardsPlayer2.getCard(i));
+			InitString2 += cardsPlayer2.getCard(i); // part of
 			InitString2 += ", "; // part of 
 		}
 		System.out.println(InitString2); //  up to here 
@@ -224,11 +264,13 @@ public class Table extends JFrame implements ActionListener
 		rightBorder.add(setPanels[12]);
 		add(rightBorder, BorderLayout.EAST);
 
+		//System.out.print(cardsPlayer1.getNumberOfCards());
+
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
-		// will try to make it work so it sorts the cards (just by rank? just by suit? teh whole suit??)
+		// will try to make it work so it sorts the cards (just by rank? just by suit? the whole suit??)
         
 
 		Object src = e.getSource();
@@ -248,24 +290,32 @@ public class Table extends JFrame implements ActionListener
 
 		// }
 
-		if(p1Deck == src  && turn == 1){
+		if(p1Deck == src  && turn == 1 && drew == false){
 				Card card = cardDeck.dealCard();
-
 			if (card != null){
-					p1Hand.addElement(card);
+					cardsPlayer1.addCard(card);
+					cardsPlayer1.sort();
 					System.out.print("Player 1" + "\n");
 					System.out.println("	Added: " + card);
 			}
 			if(cardDeck.getSizeOfDeck() == 0)
 				deckPile.setIcon(new ImageIcon(Card.directory + "blank.gif"));
 
+            // update the action on screen
+			p1Hand.removeAllElements();
+			for (int i = 0; i < cardsPlayer1.getNumberOfCards(); i++){
+				p1Hand.addElement(cardsPlayer1.getCard(i));
+			}
+			drew = true;
 		}
 
-		if(p2Deck == src  && turn == 2){
+		if(p2Deck == src  && turn == 2 && drew == false){
 			Card card = cardDeck.dealCard();
 
 		if (card != null){
-				p2Hand.addElement(card);
+				// p2Hand.addElement(card);
+				cardsPlayer2.addCard(card);
+				cardsPlayer2.sort();
 				System.out.print("Player 2" + "\n");
 				System.out.println("	Added: " + card);
 				// System.out.println("Player 2 Added: " + card);
@@ -273,10 +323,36 @@ public class Table extends JFrame implements ActionListener
 		if(cardDeck.getSizeOfDeck() == 0)
 			deckPile.setIcon(new ImageIcon(Card.directory + "blank.gif"));
 
+			p2Hand.removeAllElements();
+			for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
+				p2Hand.addElement(cardsPlayer2.getCard(i));
+			}
+			drew = true;
+
 	}
 
-		if(p1Stack == src || p2Stack == src){
+		// if(p1Stack == src || p2Stack == src){
 
+		// 	Card card = stackDeck.removeCard();
+
+		// 	if(card != null){
+		// 		Card topCard = stackDeck.peek();
+		// 		if (topCard != null)
+		// 			topOfStack.setIcon(topCard.getCardImage());
+		// 		else
+		// 			topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+
+		// 		if(p1Stack == src)
+		// 			p1Hand.addElement(card);
+		// 		else
+		// 			p2Hand.addElement(card);
+
+
+		// 	}
+
+		// }
+
+		if(p1Stack == src && turn == 1 && drew == false){
 			Card card = stackDeck.removeCard();
 
 			if(card != null){
@@ -285,68 +361,112 @@ public class Table extends JFrame implements ActionListener
 					topOfStack.setIcon(topCard.getCardImage());
 				else
 					topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+				
+				cardsPlayer1.addCard(card);
+				cardsPlayer1.sort();
+				p1Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer1.getNumberOfCards(); i++){
+					p1Hand.addElement(cardsPlayer1.getCard(i));
+				}
+				drew = true;
+		}
+	}
 
-				if(p1Stack == src)
-					p1Hand.addElement(card);
+		if(p2Stack == src && turn == 2 && drew == false){
+			Card card = stackDeck.removeCard();
+
+			if(card != null){
+				Card topCard = stackDeck.peek();
+				if (topCard != null)
+					topOfStack.setIcon(topCard.getCardImage());
 				else
-					p2Hand.addElement(card);
-
-
-			}
-
+					topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+				
+				cardsPlayer2.addCard(card);
+				cardsPlayer2.sort();
+				p2Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
+					p2Hand.addElement(cardsPlayer2.getCard(i));
+				}
+				drew = true;
 		}
+	}
 
-		if(p1Lay == src){
+		if(p1Lay == src && turn == 1 && layed == false){
 			Object [] cards = p1HandPile.getSelectedValues();
-			if (cards != null)
+			if (cards.length > 0)
 				for(int i = 0; i < cards.length; i++)
 				{
 					Card card = (Card)cards[i];
 					layCard(card);
-					p1Hand.removeElement(card);
+					cardsPlayer1.removeCard(card);
 				}
+				p1Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer1.getNumberOfCards(); i++){
+					p1Hand.addElement(cardsPlayer1.getCard(i));
+				}
+				layed = true;
+				SetTurn(2);
 		}
 
 
-		if(p2Lay == src){
+		if(p2Lay == src && turn == 2 && layed == false){
 			Object [] cards = p2HandPile.getSelectedValues();
-			if (cards != null)
+			if (cards.length > 0)
 				for(int i = 0; i < cards.length; i++)
 				{
 					Card card = (Card)cards[i];
 					layCard(card);
-					p2Hand.removeElement(card);
+					cardsPlayer2.removeCard(card);
 				}
+				p2Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
+					p2Hand.addElement(cardsPlayer2.getCard(i));
+				}
+				layed = true;
+				SetTurn(1);
 		}
 
 
-		if(p1LayOnStack == src && turn == 1){
+		if(p1LayOnStack == src && turn == 1 && layed == false){
 			int [] num  = p1HandPile.getSelectedIndices();
 			if (num.length == 1)
 			{
 				Object obj = p1HandPile.getSelectedValue();
 				if (obj != null)
-				{
-					p1Hand.removeElement(obj);
+				{   cardsPlayer1.removeCard((Card)obj);
 					Card card = (Card)obj;
 					stackDeck.addCard(card);
 					topOfStack.setIcon(card.getCardImage());
 					System.out.println("	Discarded: " + card);
 				}
+				p1Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer1.getNumberOfCards(); i++){
+					p1Hand.addElement(cardsPlayer1.getCard(i));
+				}
+				layed = true;
+				SetTurn(2);
 			}
 			// if no cards are selected and the lay on stack button is pressed discard a random card from player hand
 			else if (num.length == 0) 
-			{
-					int cardNums = p1Hand.getSize(); // get the number of cards in player hand
+			{        
+				    int cardNums = cardsPlayer1.getNumberOfCards(); // get the number of cards in player hand
 					Random rand = new Random(); //instance of random class
 					int discCard = rand.nextInt(cardNums); // generate the random value for card to be discarted
-					Object toremove = p1Hand.getElementAt(discCard); // get the element that will be removed from hand 
-					p1Hand.removeElementAt(discCard); // remove the element from hand 
+                    Card toremove = cardsPlayer1.getCardAt(discCard); // get the element that will be removed from hand
+					cardsPlayer1.removeCard(discCard); // remove the element from hand 
                     System.out.println("	Discarded: " + toremove);
-					Card card = (Card)toremove; // create card object
-					stackDeck.addCard(card); // add card removed from payer hand to stack in table
-					topOfStack.setIcon(card.getCardImage()); // add the image for that card
+					stackDeck.addCard(toremove); // add card removed from player hand to stack in table
+					topOfStack.setIcon(toremove.getCardImage()); // add the image for that card
+
+					p1Hand.removeAllElements();
+					for (int i = 0; i < cardsPlayer1.getNumberOfCards(); i++){
+					p1Hand.addElement(cardsPlayer1.getCard(i));
+					}
+					layed = true;
 					SetTurn(2); 
+
+
 			}
 			System.out.print("	Hand now: ");
 			for (int i = 0; i < p1Hand.getSize();i++)
@@ -361,7 +481,7 @@ public class Table extends JFrame implements ActionListener
 	
 
 
-		if(p2LayOnStack == src && turn == 2){
+		if(p2LayOnStack == src && turn == 2 && layed == false){
 			int [] num  = p2HandPile.getSelectedIndices();
 			if (num.length == 1)
 			{
@@ -369,25 +489,40 @@ public class Table extends JFrame implements ActionListener
 				if (obj != null)
 				{
 
-					p2Hand.removeElement(obj);
+					// p2Hand.removeElement(obj);
+					cardsPlayer2.removeCard((Card) obj);
 					Card card = (Card)obj;
 					stackDeck.addCard(card);
 					topOfStack.setIcon(card.getCardImage());
 					System.out.println("	Discarded: " + card);
 				}
+				p2Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
+					p2Hand.addElement(cardsPlayer2.getCard(i));
+				}
+				layed = true;
 				SetTurn(1);
 			}
 			else if (num.length == 0)
 			{
-				int cardNums = p2Hand.getSize(); // get the number of cards in player hand
+				int cardNums = cardsPlayer2.getNumberOfCards();
+				//int cardNums = p2Hand.getSize(); // get the number of cards in player hand
 				Random rand = new Random(); //instance of random class
 				int discCard = rand.nextInt(cardNums); // generate the random value for card to be discarted
-				Object toremove = p2Hand.getElementAt(discCard); // get the element that will be removed from hand 
-				p2Hand.removeElementAt(discCard); // remove the element from hand 
+				Card toremove = cardsPlayer2.getCardAt(discCard);
+				//Object toremove = p2Hand.getElementAt(discCard); // get the element that will be removed from hand 
+				//p2Hand.removeElementAt(discCard); // remove the element from hand
+				cardsPlayer2.removeCard(toremove);
                 System.out.println("	Discarded: " + toremove);
 				Card card = (Card)toremove; // create card object
 				stackDeck.addCard(card); // add card removed from payer hand to stack in table
 				topOfStack.setIcon(card.getCardImage()); // add the image for that card
+
+				p2Hand.removeAllElements();
+				for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
+					p2Hand.addElement(cardsPlayer2.getCard(i));
+				}
+				layed = true;
 				SetTurn(1);
 		    }
 			System.out.print("	Hand now: ");
@@ -399,13 +534,8 @@ public class Table extends JFrame implements ActionListener
 			}
 			System.out.println();
 		}
-
+	
 	}
-	// public static void main(String args[])
-	// {
-	// 	Table t = new Table();
-	// 	t.setVisible(true);
-	// }
 
 	void layCard(Card card)
 	{
@@ -414,7 +544,7 @@ public class Table extends JFrame implements ActionListener
 		int suitIndex =  Card.getSuitIndex(suit);
 		int rankIndex =  Card.getRankIndex(rank);
 		//setPanels[rankIndex].array[suitIndex].setText(card.toString());
-		System.out.println("laying " + card);
+		System.out.println("	Laying " + card);
 		setPanels[rankIndex].array[suitIndex].setIcon(card.getCardImage());
 	}
 
