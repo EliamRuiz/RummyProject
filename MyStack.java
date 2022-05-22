@@ -1,6 +1,6 @@
 /*******************************************************************
-Programado por  ******* (para anonimato en kritik)
-Numero de estudiante ******* (para anonimato en kritik)
+Programado por  Eliam Ruiz Agosto (para anonimato en kritik)
+Numero de estudiante 801-18-7235 (para anonimato en kritik)
 CCOM 4029 Lenguajes de alto nivel
 Sección 0U1
 */
@@ -45,15 +45,26 @@ public class MyStack{
     // funcion para sacar la ultima carta del stack
     public Card pop(){ 
 
-        Card data;
-        top--;
-        data = stackArray[top];
-        stackArray[top] = null;
-        return data;
+        if (top == 0){
+            return null;
+        }
+        else {
+            Card data;
+            data = stackArray[top - 1];
+            top--;
+            return data;
+        }
+
+        
     }
     // funcion para devolver cual es la ultima carta del stack
-    public int top(){
-        return top;
+    public Card top(){
+        if (top == 0){
+            return null;
+        }
+        else{
+        return stackArray[top-1];
+        }
     }
     // funcion que devuelve true si el satck esta vacio y falso si tiene cartas
     public Boolean isEmpty(){

@@ -46,6 +46,7 @@ public class Table extends JFrame implements ActionListener
 	JList p2HandPile;
 	Deck cardDeck;
 	Deck stackDeck;
+	//MyStack stackDeck;
 
 	SetPanel [] setPanels = new SetPanel[13];
 	JLabel topOfStack;
