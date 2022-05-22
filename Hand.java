@@ -5,8 +5,12 @@
 // the specifics of what constitutes the evaluation of a hand
 // for the game being implemented.
 
+// Some changes were made by Eliam Ruiz Agosto for the Rummy project in CCOM4029class 
+// mainly they were adding a function do that a computer can play the hands called play()
+
 import java.util.*;
 import javax.swing.*;
+import java.util.Date;
 
 
 /**
@@ -191,19 +195,33 @@ public class Hand implements HandInterface {
         hand.set( location, replacementCard );
         return true;
     }
+    /* This function work to make the computer be able to play a game b yitself if the user desires it that way in the gui
+    */
 
-    public void play(Table currPlaySession) {
+    public void play(Table currPlaySession) { 
 
-      if (currPlaySession.GetTurn() == 1){
-          currPlaySession.p1Deck.doClick();
-          currPlaySession.p1LayOnStack.doClick();
+      if (currPlaySession.GetTurn() == 1){    // if to verify and respect the turns 
+          currPlaySession.p1Deck.doClick();   // let the computer grab a card
+          try {
+            Thread.sleep(500);         // wait half a second for next move
+         } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+          currPlaySession.p1LayOnStack.doClick(); // lay card and end turn
       }
-      else if (currPlaySession.GetTurn() == 2) {
-         currPlaySession.p2Deck.doClick();
-         currPlaySession.p2LayOnStack.doClick();
+      else if (currPlaySession.GetTurn() == 2) {  // if to verify and respect turns
+         currPlaySession.p2Deck.doClick();        // garb a card from the deck 
+         try {
+            Thread.sleep(500);            // wait half a second for next move
+         } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         currPlaySession.p2LayOnStack.doClick();  // lay card on stack and end turn
       }
-      // System.out.println("Im here"); // repeating endlessly not changing the value of turn
     }
+    // This function allows us to get a card at a specific location in the stack
     public Card getCardAt(int index){
           return (Card)hand.get(index);
     }

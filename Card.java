@@ -3,6 +3,8 @@
 // Implementation of a playing card.  Uses classes Rank and Suit for
 // expressing the card value.
 
+// minimal changes made by Eliam Ruiz Agosto, mainly corrected the switch case for the rank index
+
 import javax.swing.*;
 
 
@@ -68,7 +70,7 @@ public class Card implements Comparable {
 				return -1;
 
 	}
-
+// fixed the switch case in order for it to return the appropiate rank index
 	public static int getRankIndex(char rank)
 	{
 					switch (rank){
@@ -154,9 +156,10 @@ public class Card implements Comparable {
    * @return a negative integer, zero, or a positive integer is this card is
    * less than, equal to, or greater than the referenced card.
    */
+  // cahnged to rank value in order to have some (although incomplete) sorting
    public int compareTo( Object otherCardObject ) {
       Card otherCard = (Card) otherCardObject;
-	  int rankDiff = getRankIndex(suitValue) - getRankIndex(otherCard.suitValue) ;
+	  int rankDiff = getRankIndex(rankValue) - getRankIndex(otherCard.rankValue) ;
 	  return rankDiff;
    }
 

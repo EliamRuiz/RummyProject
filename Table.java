@@ -1,7 +1,26 @@
+/* Programmed Eliam Ruiz Agosto
+   801-18-7235
+   Purpose  : This program is the table class which contains the GUI for the rummy game. Most of the game and interactions
+              are handled or instantiated within this class. 
+   Dictionary of variables: 
+                - Many JFrame, JPanel, JLabel variables - used to control the gui
+				- boolean Drew - Helps us now if a card has been drawn from deck or stack in a given turn
+				- boolean layed - Helps us now if a card has been layed from deck or stack in a given turn
+				- boolean auto - Helps us know if the Automatic Play button has been pressed
+				- Hand cardsPlayer1 - This hand object is used to manipulate and keep track of the hand of player1 at any time
+	            - Hand cardsPlayer2 - This hand object is used to manipulate and keep track of the hand of player2 at any time
+				- DefaultListModel p1Hand - Mimics the cardsplayer1 hand moves but allows the changes to be visible in the gui
+	            - DefaultListModel p2Hand - Mimics the cardsplayer2 hand moves but allows the changes to be visible in the gui
+				- Deck cardDeck - This is a deck object that helps us manage the deck of cards in a game session
+	            - Deck stackDeck - This is a deck object that helps us smanage the stack of cards that the players discard\
+				- Many local variables for each function and in each class
+
+			  */
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
+
 /**
 *	This GUI assumes that you are using a 52 card deck and that you have 13 sets in the deck.
 *	The GUI is simulating a playing table
@@ -11,11 +30,14 @@ import java.util.*;
 // }
 public class Table extends JFrame implements ActionListener
 {
+	// variables to handle the gui and some of the game logic
 	final static int numDealtCards = 9;
 	int turn; 
 	JPanel player1;
 	JPanel player2;
 	JLabel points;
+	JLabel gameOver;
+	JPanel finished;
 	JPanel playerTurn;
 	JPanel deckPiles;
 	JLabel deck;
@@ -30,6 +52,7 @@ public class Table extends JFrame implements ActionListener
 	JLabel deckPile;
 	JButton p1Stack;
 	JButton p2Stack;
+	JButton automatic;
 
 	JButton p1Deck;
 	JButton p2Deck;
@@ -48,17 +71,18 @@ public class Table extends JFrame implements ActionListener
 
 	boolean drew;
 	boolean layed;
-
+	boolean auto = false;
+// function to deal cards to players (nine per player)
 	private void deal(Hand cards)
 	{
 		
 		for(int i = 0; i < numDealtCards; i ++){
-		    // System.out.println("HEREEEEEEEEEEEEE");
+		    
 			cards.addCard((Card)cardDeck.dealCard());
 		}
 		cards.sort();
 	}
-
+// public functions to access and set class variables
 	public void SetTurn (int curr) { // setter for turn variable
 		 this.turn = curr;
 		 this.drew = false;
@@ -67,29 +91,33 @@ public class Table extends JFrame implements ActionListener
 	public int GetTurn() { // getter for turn variable
 		return this.turn;
 	}	
-	public boolean OutOfCards() {
+	public boolean OutOfCards() {  // notifier of end of deck
 		return this.cardDeck.isEmpty();
 	}
-	public boolean Player1OutOfCards() {
+	public boolean Player1OutOfCards() {  // notifier of player 1 out of cards
 		return this.cardsPlayer1.isEmpty();
 	}
-	public boolean Player2OutOfCards() {
-		return this.cardsPlayer2.isEmpty();
+	public boolean Player2OutOfCards() {  // notifier of player two out of cards
+		return this.cardsPlayer2.isEmpty(); 
 	}
-	public Hand getPlayer1Cards() {
-	//	System.out.print(cardsPlayer1.getNumberOfCards());
+	public Hand getPlayer1Cards() {  // getter for player one's cards in hand
 		return this.cardsPlayer1;
 	}
-	public Hand getPlayer2Cards() {
+	public Hand getPlayer2Cards() { // getter for playes two's cards in hand
 		return this.cardsPlayer2;
 	}
+	public boolean getAutoFlag() { // getter for automatric play button pressed flag
+		return this.auto;
+	}
+	// constructor for table object
 	public Table()
 	{
 		// sets the window title
 		super("The Card Game of the Century");
         // sets the wondow standard size and layout
 		setLayout(new BorderLayout());
-		setSize(1200,700);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setSize(dim.width,dim.height);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // creates an empty deck using its default constructor
@@ -101,52 +129,49 @@ public class Table extends JFrame implements ActionListener
 				cardDeck.addCard(card);
 			}
 		}
+		
 		// shuffles cards in deck
 		cardDeck.shuffle();
 		// creates a new empty deck
 		stackDeck = new Deck();
-        // 
+        //  creates j panel for top of window
 		JPanel top = new JPanel();
-
+        // sets panels per card rank
 		for (int i = 0; i < Card.rank.length;i++)
 			setPanels[i] = new SetPanel(Card.getRankIndex(Card.rank[i]));
-		
-
-
-		top.add(setPanels[0]);
+	
+        //  add panels to teh top of window (J FRAME)
+		top.add(setPanels[0]); 
 		top.add(setPanels[1]);
 		top.add(setPanels[2]);
 		top.add(setPanels[3]);
-
-	//	points = new JLabel("Player's one Turn");
-     //   playerTurn = new JPanel();
-    
-	//	playerTurn.add(points);
-
-
+        // j label and panel to notify the current turn in the gui
+		points = new JLabel("Player's one Turn");
+        playerTurn = new JPanel();
+		playerTurn.add(points);
+        // j label and panel to notify game over in the gui
+		gameOver = new JLabel ("Game over!!");
+		finished = new JPanel();
+		finished.add(gameOver);
+        // adding player turn to player one area i nthe gui         
 		player1 = new JPanel();
-	//	player1.add(playerTurn);
-
+		player1.add(playerTurn);
+		// setting player one area in the gui
 		player1.add(top);
-
-
-
-
 		add(player1, BorderLayout.NORTH);
-		JPanel bottom = new JPanel();
-
-
+		// j panel to set bottom area in the gui
+		JPanel bottom = new JPanel( );
 		bottom.add(setPanels[4]);
 		bottom.add(setPanels[5]);
 		bottom.add(setPanels[6]);
 		bottom.add(setPanels[7]);
 		bottom.add(setPanels[8]);
-
+	//****************************************************************************** */
+		//bottom.add(finished);
+	//********************************************************************************* */
+        // creating j panel for player two
 		player2 = new JPanel();
-
-
-
-
+        // adding player two to bottom
 		player2.add(bottom);
 		add(player2, BorderLayout.SOUTH); 
 
@@ -161,6 +186,9 @@ public class Table extends JFrame implements ActionListener
 		p1Lay.addActionListener(this);
 		p1LayOnStack = new JButton("LayOnStack");
 		p1LayOnStack.addActionListener(this);
+		automatic = new JButton("Automatic Play");
+		automatic.addActionListener(this);
+		
 
         // creates the player_one hand initial cards
 		cardsPlayer1 = new Hand();
@@ -173,14 +201,14 @@ public class Table extends JFrame implements ActionListener
 		{
 			p1Hand.addElement(cardsPlayer1.getCard(i));
 			// print the player one first hand 
-            InitString += cardsPlayer1.getCard(i); // part of
-			InitString += ", "; // part of 
+            InitString += cardsPlayer1.getCard(i); // part of ^
+			InitString += ", "; // part of  ^
 		}
 		System.out.println(InitString); //  up to here 
 
 		p1HandPile = new JList(p1Hand);
 
-		// creates the
+		
 		middle.add(new HandPanel("Player 1", p1HandPile, p1Stack, p1Deck, p1Lay, p1LayOnStack));
 
 		deckPiles = new JPanel();
@@ -195,7 +223,7 @@ public class Table extends JFrame implements ActionListener
 
 		left.add(stack);
 		topOfStack = new JLabel();
-		topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+		topOfStack.setIcon(new ImageIcon(Card.directory + "blankStack.gif"));
 		topOfStack.setAlignmentY(Component.CENTER_ALIGNMENT);
 		left.add(topOfStack);
 		deckPiles.add(left);
@@ -225,6 +253,10 @@ public class Table extends JFrame implements ActionListener
 		p2Lay.addActionListener(this);
 		p2LayOnStack = new JButton("LayOnStack");
 		p2LayOnStack.addActionListener(this);
+		automatic = new JButton("Automatic Play");
+		automatic.addActionListener(this);
+
+		
 
 		cardsPlayer2 = new Hand();
 		deal(cardsPlayer2);
@@ -243,7 +275,7 @@ public class Table extends JFrame implements ActionListener
 
 		p2HandPile = new JList(p2Hand);
 
-		middle.add(new HandPanel("Player 2", p2HandPile, p2Stack, p2Deck, p2Lay, p2LayOnStack));
+		middle.add(new HandPanel("Player 2", p2HandPile, p2Stack, p2Deck, p2Lay, p2LayOnStack, automatic));
 
 		add(middle, BorderLayout.CENTER);
 
@@ -274,23 +306,8 @@ public class Table extends JFrame implements ActionListener
         
 
 		Object src = e.getSource();
-		// if(p1Deck == src|| p2Deck == src){ // idea to split into two and use turn in conjuntions with the src 
-
-		// 	Card card = cardDeck.dealCard();
-
-		// 	if (card != null){
-		// 		if(src == p1Deck)
-		// 			p1Hand.addElement(card);
-		// 		else
-		// 			p2Hand.addElement(card);
-		// 	}
-		// 	if(cardDeck.getSizeOfDeck() == 0)
-		// 		deckPile.setIcon(new ImageIcon(Card.directory + "blank.gif"));
-
-
-		// }
-
-		if(p1Deck == src  && turn == 1 && drew == false){
+		// this if statement deals with the action corrresponding to the deck button for player one
+		if(p1Deck == src  && turn == 1 && drew == false){ 
 				Card card = cardDeck.dealCard();
 			if (card != null){
 					cardsPlayer1.addCard(card);
@@ -299,7 +316,7 @@ public class Table extends JFrame implements ActionListener
 					System.out.println("	Added: " + card);
 			}
 			if(cardDeck.getSizeOfDeck() == 0)
-				deckPile.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+				deckPile.setIcon(new ImageIcon(Card.directory + "blankDeck.gif"));
 
             // update the action on screen
 			p1Hand.removeAllElements();
@@ -308,7 +325,7 @@ public class Table extends JFrame implements ActionListener
 			}
 			drew = true;
 		}
-
+        // this if statement deals with the action corresponding to the deck button for player two
 		if(p2Deck == src  && turn == 2 && drew == false){
 			Card card = cardDeck.dealCard();
 
@@ -321,7 +338,7 @@ public class Table extends JFrame implements ActionListener
 				// System.out.println("Player 2 Added: " + card);
 		}
 		if(cardDeck.getSizeOfDeck() == 0)
-			deckPile.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+			deckPile.setIcon(new ImageIcon(Card.directory + "blankDeck.gif"));
 
 			p2Hand.removeAllElements();
 			for (int i = 0; i < cardsPlayer2.getNumberOfCards(); i++){
@@ -330,28 +347,7 @@ public class Table extends JFrame implements ActionListener
 			drew = true;
 
 	}
-
-		// if(p1Stack == src || p2Stack == src){
-
-		// 	Card card = stackDeck.removeCard();
-
-		// 	if(card != null){
-		// 		Card topCard = stackDeck.peek();
-		// 		if (topCard != null)
-		// 			topOfStack.setIcon(topCard.getCardImage());
-		// 		else
-		// 			topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
-
-		// 		if(p1Stack == src)
-		// 			p1Hand.addElement(card);
-		// 		else
-		// 			p2Hand.addElement(card);
-
-
-		// 	}
-
-		// }
-
+        // this if statement deals with the action corresponding to the stack button for player one
 		if(p1Stack == src && turn == 1 && drew == false){
 			Card card = stackDeck.removeCard();
 
@@ -360,7 +356,7 @@ public class Table extends JFrame implements ActionListener
 				if (topCard != null)
 					topOfStack.setIcon(topCard.getCardImage());
 				else
-					topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+					topOfStack.setIcon(new ImageIcon(Card.directory + "blankStack.gif"));
 				
 				cardsPlayer1.addCard(card);
 				cardsPlayer1.sort();
@@ -371,7 +367,7 @@ public class Table extends JFrame implements ActionListener
 				drew = true;
 		}
 	}
-
+    // this if statement deals with the action corresponding to the stack button for player two
 		if(p2Stack == src && turn == 2 && drew == false){
 			Card card = stackDeck.removeCard();
 
@@ -380,7 +376,7 @@ public class Table extends JFrame implements ActionListener
 				if (topCard != null)
 					topOfStack.setIcon(topCard.getCardImage());
 				else
-					topOfStack.setIcon(new ImageIcon(Card.directory + "blank.gif"));
+					topOfStack.setIcon(new ImageIcon(Card.directory + "blankStack.gif"));
 				
 				cardsPlayer2.addCard(card);
 				cardsPlayer2.sort();
@@ -391,7 +387,7 @@ public class Table extends JFrame implements ActionListener
 				drew = true;
 		}
 	}
-
+    //this if statement deals with the action corresponding to the lay button for player one
 		if(p1Lay == src && turn == 1 && layed == false){
 			Object [] cards = p1HandPile.getSelectedValues();
 			if (cards.length > 0)
@@ -407,9 +403,9 @@ public class Table extends JFrame implements ActionListener
 				}
 				layed = true;
 				SetTurn(2);
+				points.setText("Player two's turn");
 		}
-
-
+        //this if statement deals with the action corresponding to the lay  button for player two
 		if(p2Lay == src && turn == 2 && layed == false){
 			Object [] cards = p2HandPile.getSelectedValues();
 			if (cards.length > 0)
@@ -425,9 +421,9 @@ public class Table extends JFrame implements ActionListener
 				}
 				layed = true;
 				SetTurn(1);
+				points.setText("Player one's turn");
 		}
-
-
+        // this if statement deals with the action corresponding to the layonstack button for player one
 		if(p1LayOnStack == src && turn == 1 && layed == false){
 			int [] num  = p1HandPile.getSelectedIndices();
 			if (num.length == 1)
@@ -446,6 +442,7 @@ public class Table extends JFrame implements ActionListener
 				}
 				layed = true;
 				SetTurn(2);
+				points.setText("Player two's turn");
 			}
 			// if no cards are selected and the lay on stack button is pressed discard a random card from player hand
 			else if (num.length == 0) 
@@ -465,6 +462,7 @@ public class Table extends JFrame implements ActionListener
 					}
 					layed = true;
 					SetTurn(2); 
+					points.setText("Player two's turn");
 
 
 			}
@@ -478,9 +476,7 @@ public class Table extends JFrame implements ActionListener
 			System.out.println(); 
 			// SetTurn(2); ?????????????????
 		}
-	
-
-
+	    // this if statement deals with the action corresponding to the layonstack button for player two
 		if(p2LayOnStack == src && turn == 2 && layed == false){
 			int [] num  = p2HandPile.getSelectedIndices();
 			if (num.length == 1)
@@ -488,8 +484,6 @@ public class Table extends JFrame implements ActionListener
 				Object obj = p2HandPile.getSelectedValue();
 				if (obj != null)
 				{
-
-					// p2Hand.removeElement(obj);
 					cardsPlayer2.removeCard((Card) obj);
 					Card card = (Card)obj;
 					stackDeck.addCard(card);
@@ -502,6 +496,7 @@ public class Table extends JFrame implements ActionListener
 				}
 				layed = true;
 				SetTurn(1);
+				points.setText("Player one's turn");
 			}
 			else if (num.length == 0)
 			{
@@ -524,6 +519,7 @@ public class Table extends JFrame implements ActionListener
 				}
 				layed = true;
 				SetTurn(1);
+				points.setText("Player one's turn");
 		    }
 			System.out.print("	Hand now: ");
 			for (int i = 0; i < p2Hand.getSize();i++)
@@ -534,9 +530,12 @@ public class Table extends JFrame implements ActionListener
 			}
 			System.out.println();
 		}
+		if (automatic == src){
+             auto = true;
+		}
 	
 	}
-
+// this function defines the way to lay cards
 	void layCard(Card card)
 	{
 		char rank = card.getRank();
@@ -553,6 +552,33 @@ public class Table extends JFrame implements ActionListener
 class HandPanel extends JPanel
 {
 
+	public HandPanel(String name,JList hand, JButton stack, JButton deck, JButton lay, JButton layOnStack, JButton automatic)
+	{
+		//model = hand.createSelectionModel();
+
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+//		add(Box.createGlue());
+		JLabel label = new JLabel(name);
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		add(label);
+		stack.setAlignmentX(Component.CENTER_ALIGNMENT);
+//		add(Box.createGlue());
+		add(stack);
+		deck.setAlignmentX(Component.CENTER_ALIGNMENT);
+//		add(Box.createGlue());
+		add(deck);
+		lay.setAlignmentX(Component.CENTER_ALIGNMENT);
+		add(lay);
+		layOnStack.setAlignmentX(Component.CENTER_ALIGNMENT);
+		add(layOnStack);
+		add(Box.createGlue());
+		add(hand);
+		add(Box.createGlue());
+		automatic.setAlignmentX(Component.CENTER_ALIGNMENT);
+		add(automatic);
+		add(Box.createGlue());
+	}
+	// added a second constructor of hand panel in order to be able to just have one automatic play button
 	public HandPanel(String name,JList hand, JButton stack, JButton deck, JButton lay, JButton layOnStack)
 	{
 		//model = hand.createSelectionModel();
@@ -575,6 +601,7 @@ class HandPanel extends JPanel
 		add(Box.createGlue());
 		add(hand);
 		add(Box.createGlue());
+	
 	}
 
 }
